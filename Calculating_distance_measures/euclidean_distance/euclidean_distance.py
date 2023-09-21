@@ -1,0 +1,58 @@
+import numpy as np
+class Euclidean_Distance:
+
+    def __init__(self, hospital, diagnosis):
+        self.hospital = hospital
+        self.diagnosis = diagnosis
+        
+
+    def connect_rows(self, df):
+        connections = []
+        for i in range(len(df)):
+            for j in range(len(df)):
+                if i == j:
+                    continue
+
+                if [i, j][::-1] in connections:
+                    continue
+                connections.append([i, j])
+        return connections
+
+    def measure_distance(self, a, b):
+        """"
+        param a: list of integers
+        param b: list of integers
+        returns: the Euclidean distance as an integer
+        """
+        
+        # param a and b have to be of the same length else the euclidean calcuation will fail
+        if len(a) != len(b):
+            print(f"len a {len(a)} is not equal to len b {len(b)}")
+            exit()
+
+        total = 0
+   
+        for i in range(len(a)):
+            total += ((a[i] - b[i])**2)
+
+        euclidean_distance = np.sqrt(total)
+        return euclidean_distance
+
+    def calculate_average(self, distances):
+        """
+        param distance: list of calculated distances(integers)
+        returns: average distance of all calculated distances as an integer
+        """
+
+        amount = len(distances)
+        total = sum(distances)
+        average = total/amount
+        
+        return average
+
+
+# a = [1,2,3]
+# b = [1,1,1]
+# test = Euclidean_Distance("UMCG", "HC")
+# test.locate_neighbors()
+# print(test.measure_distance(a,b))
