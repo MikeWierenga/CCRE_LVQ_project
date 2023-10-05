@@ -6,8 +6,10 @@ import euclidean_distance
 import numpy as np
 sys.path.append('CCRE_distance')
 import cre 
+import ccre
 import pandas as pd
-
+from sklearn import preprocessing
+import scipy.integrate as integrate
 class Main():
 
     def __init__(self, hospital, diagnosis):
@@ -30,9 +32,12 @@ class Main():
         
         #normalizing the data(everything is between 0 and 1)
         df_labels = df.iloc[:, :2]
-        normalized_df =  (df.iloc[:, 2:]-df.iloc[:, 2:].mean())/df.iloc[:, 2:].std()
-        # normalized_df = (df.iloc[:, 2:]-df.iloc[:, 2:].min())/(df.iloc[:, 2:].max()-df.iloc[:, 2:].min())
-        dataframes = [df_labels, normalized_df]
+        x = df.iloc[:, 2:].values
+        scaler = preprocessing.MinMaxScaler(feature_range=(0,1)).fit_transform(x)
+
+        df_scaled = pd.DataFrame(scaler)
+        
+        dataframes = [df_labels, df_scaled]
         df = pd.concat(dataframes, axis=1)
 
         # # calculating the Euclidean distance
@@ -55,11 +60,28 @@ class Main():
 
         # calculate the CRE
         cre_distance = cre.CRE(df)
-    
         cre_distance.calculate_cre()
         cre_distance.cre_gaussian_distribution()
 
-        #calculating CCRE 
+        # #calculating CCRE 
+        print("VANAF HIER IS CCRE")
+        ccre_distance = ccre.CCRE()
+        x = df.iloc[0,2:]
+        y = df.iloc[1, 2:]
+        x = np.array(x).reshape(-1,1)
+        y =np.array(y).reshape(-1,1)
+        data = np.concatenate((x,y), axis=1)
+   
+        
+        joint = ccre_distance.calculate_joint_dist(data)
+        print(joint)
+    
+        # mu = np.mean(data)
+        # sigma2 = np.var(data)
+        # sigma = np.sqrt(sigma2)
+        
+        # result = integrate.quad(ccre_distance.calculate_expactation_value, 0, np.inf, args=(mu, sigma, sigma2))
+        # print(result)
         
 hospitals = ["UMCG", "CUN", "UGOSM"]
 diagnosis = ["HC", "AD", "PD"]
