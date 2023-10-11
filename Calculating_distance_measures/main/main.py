@@ -13,6 +13,7 @@ import ccre
 import pandas as pd
 from sklearn import preprocessing
 import scipy.integrate as integrate
+import matplotlib.pyplot as plt
 class Main():
 
     def __init__(self, hospital, diagnosis):
@@ -62,8 +63,8 @@ class Main():
         # return average_distance
 
         # calculate the CRE
-        cre_distance = cre.CRE(df)
-        cre_distance.cre_gaussian_distribution()
+        # cre_distance = cre.CRE(df)
+        # cre_distance.cre_gaussian_distribution()
 
         # #calculating CCRE 
         print("VANAF HIER IS CCRE")
@@ -73,15 +74,26 @@ class Main():
         y =np.array(y).reshape(-1,1)
         x= x.astype(np.float32)
         y = y.astype(np.float32)
+
         data = np.concatenate((x,y), axis=1)
         ccre_distance = ccre.CCRE(data.T)
-        new_entry = np.array([1, 2])
-        result = ccre_distance.calculate_joint_dist(new_entry)
         
-        
-        # test calculate marginal
-        marginal = ccre_distance.calculate_margin_pdf(result, np.mean(x), np.sqrt(np.var(x)), np.var(x))
-        print(marginal)
+        range_of_y = np.sqrt(np.var(y)) * 4 #range for new entries to calculate the cre of Y|X X will remain constant
+        # print(range_of_y)
+        new_dx = np.linspace(0,0,1000000) #will remain a fixed value
+        new_dy = np.linspace(-range_of_y, range_of_y, 1000000) #between 4 * standard deviation of y
+        # new_entry = np.array([0, 0])
+        bivariate_PDF = []
+        for index, _ in enumerate(new_dx):
+            new_entry = np.array([0, new_dy[index]])
+            # print(ccre_distance.mean[0], ccre_distance.mean[1])
+            result = ccre_distance.calculate_joint_dist(new_entry)
+            bivariate_PDF.append(result)
+        cre_YX = cre.CRE(bivariate_PDF)
+        cre_YX.cre_gaussian_distribution()
+        # # test calculate marginal
+        # marginal = ccre_distance.calculate_margin_pdf(result, np.mean(x), np.sqrt(np.var(x)), np.var(x))
+        # print(marginal)
   
     
    

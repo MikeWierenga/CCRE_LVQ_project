@@ -8,48 +8,48 @@ from scipy import integrate
 
 class CRE:
     def __init__(self, data):
-        self.data = data.iloc[0, 2:]
-        self.nbin = len(self.data)
+        self.data = data
+    #     self.nbin = len(self.data)
 
-        self.EqualSizeBinFlag = True 
+    #     self.EqualSizeBinFlag = True 
     
-    def calculate_edges(self):
-        if self.EqualSizeBinFlag:
+    # def calculate_edges(self):
+    #     if self.EqualSizeBinFlag:
             
-            edges = np.histogram_bin_edges(self.data, self.nbin)
+    #         edges = np.histogram_bin_edges(self.data, self.nbin)
            
-        else:
-            prc = np.linspace(0,100, self.nbin+1)
-            edges = np.percentile(self.data, prc, interpolation="midpoint")
-        return edges
+    #     else:
+    #         prc = np.linspace(0,100, self.nbin+1)
+    #         edges = np.percentile(self.data, prc, interpolation="midpoint")
+    #     return edges
     
-    def calculate_cre(self):
-        #step 1 calculate the CDF based on matlabs histcounts function
-        CP, bin = np.histogram(list(self.data), list(self.calculate_edges())) 
-        hist_dist = ss.rv_histogram((CP, bin))
-        CP = hist_dist.cdf(bin)[1:]
+    # def calculate_cre(self):
+    #     #step 1 calculate the CDF based on matlabs histcounts function
+    #     CP, bin = np.histogram(list(self.data), list(self.calculate_edges())) 
+    #     hist_dist = ss.rv_histogram((CP, bin))
+    #     CP = hist_dist.cdf(bin)[1:]
 
-        dl = np.diff(bin) / sum(np.diff(bin))
-        # -1 cause we are interested in the values greater or equal than x
-        FC = 1 - CP.T
+    #     dl = np.diff(bin) / sum(np.diff(bin))
+    #     # -1 cause we are interested in the values greater or equal than x
+    #     FC = 1 - CP.T
  
-        logFC = []
-        for i in FC:
-            if i == 0 :
-                logFC.append(0)
-            else:
+    #     logFC = []
+    #     for i in FC:
+    #         if i == 0 :
+    #             logFC.append(0)
+    #         else:
 
-                logFC.append(np.log(i))
+    #             logFC.append(np.log(i))
 
-        if dl.T.dot(FC) == 0:
-            cre = 0
-        else:
+    #     if dl.T.dot(FC) == 0:
+    #         cre = 0
+    #     else:
          
-            cre_part_one = -dl.T.dot(np.multiply(FC, logFC))
-            cre_part_two = dl.T.dot(FC)
-            cre = np.divide(cre_part_one, cre_part_two)
+    #         cre_part_one = -dl.T.dot(np.multiply(FC, logFC))
+    #         cre_part_two = dl.T.dot(FC)
+    #         cre = np.divide(cre_part_one, cre_part_two)
 
-        print(f'cre = {cre}')
+    #     print(f'cre = {cre}')
 
     # CRE WITH GAUSSIAN DISTRIBUTION
     # based on this post https://stats.stackexchange.com/questions/187828/how-are-the-error-function-and-standard-normal-distribution-function-related
@@ -66,13 +66,9 @@ class CRE:
 
     
     def cre_gaussian_distribution(self):
-        # data = np.array(self.data).reshape(-1,1)
-        # data = MinMaxScaler(feature_range=(0,1)).fit_transform(data)
         data = np.array(self.data)
         sigma = np.sqrt(np.var(data))
         mu = np.mean(data)
-        cumulative_distribution_results = []
-        for i in data:
-            cumulative_distribution_results.append(self.cumulative_distribution(x=i, sigma=sigma, mu=mu))
+        
    
         print((- 1 * integrate.quad(self.cumulative_distribution, 0, np.inf, args=(mu, sigma))[0]))

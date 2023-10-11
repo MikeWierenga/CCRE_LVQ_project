@@ -15,13 +15,15 @@ class CCRE:
         # print(f"{self.mean} \n {self.cov} \n {self.invcov} \n hi{self.detcov}")
 
     def fit(self, data):
-        x = data[:, 0]
-        y = data[:, 1]
+        x = data[0, :]
+        y = data[1, :]
+        
         self.mean = np.mean([x,y], axis=1)
+
         self.cov = np.cov(data)
         self.invcov = np.linalg.pinv(self.cov)
         self.detcov = np.linalg.det(self.cov)
-
+        # print(f"{self.mean} \n cov: {self.cov} \n {self.invcov} \n {self.detcov}")
 
     def calculate_joint_dist(self, new_entry):
         """
@@ -29,7 +31,8 @@ class CCRE:
         returns: 1x1 joint probability distribution function
         """
         # split this function so that we keep the mu cov and invcov
-        print(new_entry)
+        
+        
         first_part = (new_entry[:] - self.mean).reshape(-1,1).T
         last_part = first_part.T
         last_part = first_part.T
