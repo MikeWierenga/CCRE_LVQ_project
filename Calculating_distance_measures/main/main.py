@@ -1,10 +1,13 @@
+
 import sys
-sys.path.append('data')
+sys.path.append('/home/fcourse1/Desktop/afstudeerstage/code/CCRE_LVQ_project/Calculating_distance_measures/data')
+
+
 import load_data
-sys.path.append('euclidean_distance')
+sys.path.append('/home/fcourse1/Desktop/afstudeerstage/code/CCRE_LVQ_project/Calculating_distance_measures/euclidean_distance')
 import euclidean_distance
 import numpy as np
-sys.path.append('CCRE_distance')
+sys.path.append('/home/fcourse1/Desktop/afstudeerstage/code/CCRE_LVQ_project/Calculating_distance_measures/CCRE_distance')
 import cre 
 import ccre
 import pandas as pd
@@ -31,14 +34,14 @@ class Main():
         df = data.combine_dataframes(center, diagnosis, feature_vectors)
         
         #normalizing the data(everything is between 0 and 1)
-        df_labels = df.iloc[:, :2]
-        x = df.iloc[:, 2:].values
-        scaler = preprocessing.MinMaxScaler(feature_range=(0,1)).fit_transform(x)
+        # df_labels = df.iloc[:, :2]
+        # x = df.iloc[:, 2:].values
+        # scaler = preprocessing.MinMaxScaler(feature_range=(0,1)).fit_transform(x)
 
-        df_scaled = pd.DataFrame(scaler)
+        # df_scaled = pd.DataFrame(scaler)
         
-        dataframes = [df_labels, df_scaled]
-        df = pd.concat(dataframes, axis=1)
+        # dataframes = [df_labels, df_scaled]
+        # df = pd.concat(dataframes, axis=1)
 
         # # calculating the Euclidean distance
         # eu_distance = euclidean_distance.Euclidean_Distance(self.hospital, self.diagnosis)
@@ -60,28 +63,30 @@ class Main():
 
         # calculate the CRE
         cre_distance = cre.CRE(df)
-        cre_distance.calculate_cre()
         cre_distance.cre_gaussian_distribution()
 
         # #calculating CCRE 
         print("VANAF HIER IS CCRE")
-        ccre_distance = ccre.CCRE()
         x = df.iloc[0,2:]
         y = df.iloc[1, 2:]
         x = np.array(x).reshape(-1,1)
         y =np.array(y).reshape(-1,1)
+        x= x.astype(np.float32)
+        y = y.astype(np.float32)
         data = np.concatenate((x,y), axis=1)
+        ccre_distance = ccre.CCRE(data.T)
+        new_entry = np.array([1, 2])
+        result = ccre_distance.calculate_joint_dist(new_entry)
+        
+        
+        # test calculate marginal
+        marginal = ccre_distance.calculate_margin_pdf(result, np.mean(x), np.sqrt(np.var(x)), np.var(x))
+        print(marginal)
+  
+    
    
         
-        joint = ccre_distance.calculate_joint_dist(data)
-        print(joint)
-    
-        # mu = np.mean(data)
-        # sigma2 = np.var(data)
-        # sigma = np.sqrt(sigma2)
-        
-        # result = integrate.quad(ccre_distance.calculate_expactation_value, 0, np.inf, args=(mu, sigma, sigma2))
-        # print(result)
+     
         
 hospitals = ["UMCG", "CUN", "UGOSM"]
 diagnosis = ["HC", "AD", "PD"]
