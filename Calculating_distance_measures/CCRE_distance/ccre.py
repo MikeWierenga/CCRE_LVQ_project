@@ -10,14 +10,15 @@ class CCRE:
         self.cov = []
         self.invcov = []
         self.detcov = []
-        
+        self.position_y = 0
+        self.position_x = 1
         self.fit(data)
         # print(f"{self.mean} \n {self.cov} \n {self.invcov} \n hi{self.detcov}")
 
     def fit(self, data):
         y = data[0, :]
         x = data[1, :]
-        
+        print(np.mean(y))
         self.mean = np.mean([y,x], axis=1)
 
         self.cov = np.cov(data)
@@ -46,26 +47,26 @@ class CCRE:
         """
         Based on formula in book on statistics
         """
-        mean_y = ...
-        mean_x = ...
-        cov_yx = ...
-        inv_cov_xx = ...
-        x = ...
+        print(self.mean)
+        mean_y = self.mean[self.position_y]
+        mean_x = self.mean[self.position_x]
+        cov_yx = self.cov[self.position_y][self.position_x]
+        inv_cov_xx = self.invcov[self.position_x][self.position_x]
+        x = self.data[1, :]
         
-        mean_conditional = mean_y + cov_yx*inv_cov_xx*(x - mean_x)
+        mean_conditional = mean_y + cov_yx*inv_cov_xx*(x-mean_x) # this formula doesn't work yet i expect 1 value but get a vector
         return mean_conditional
     
     def cov_conditional_distribution(self):
         """
         Calculating the covariance of the conditional distribution p(Y|X)
         """
-        position_y = 0
-        position_x = 1
         
-        cov_yy = self.cov[position_y][position_y]
-        cov_yx = self.cov[position_y][position_x]
-        invcov_xx = self.invcov[position_x][position_x]
-        cov_xy = self.cov[position_x][position_y]
+        
+        cov_yy = self.cov[self.position_y][self.position_y]
+        cov_yx = self.cov[self.position_y][self.position_x]
+        invcov_xx = self.invcov[self.position_x][self.position_x]
+        cov_xy = self.cov[self.position_x][self.position_y]
 
         cov_conditional = cov_yy - cov_yx*invcov_xx*cov_xy
         return cov_conditional
