@@ -15,10 +15,10 @@ class CCRE:
         # print(f"{self.mean} \n {self.cov} \n {self.invcov} \n hi{self.detcov}")
 
     def fit(self, data):
-        x = data[0, :]
-        y = data[1, :]
+        y = data[0, :]
+        x = data[1, :]
         
-        self.mean = np.mean([x,y], axis=1)
+        self.mean = np.mean([y,x], axis=1)
 
         self.cov = np.cov(data)
         self.invcov = np.linalg.pinv(self.cov)
@@ -41,6 +41,34 @@ class CCRE:
         final_formula = (1/ (np.sqrt(2*np.pi*self.detcov))) * np.exp(formula.astype(float))[0][0]
         
         return final_formula
+
+    def mean_conditional_distribution(self):
+        """
+        Based on formula in book on statistics
+        """
+        mean_y = ...
+        mean_x = ...
+        cov_yx = ...
+        inv_cov_xx = ...
+        x = ...
+        
+        mean_conditional = mean_y + cov_yx*inv_cov_xx*(x - mean_x)
+        return mean_conditional
+    
+    def cov_conditional_distribution(self):
+        """
+        Calculating the covariance of the conditional distribution p(Y|X)
+        """
+        position_y = 0
+        position_x = 1
+        
+        cov_yy = self.cov[position_y][position_y]
+        cov_yx = self.cov[position_y][position_x]
+        invcov_xx = self.invcov[position_x][position_x]
+        cov_xy = self.cov[position_x][position_y]
+
+        cov_conditional = cov_yy - cov_yx*invcov_xx*cov_xy
+        return cov_conditional
 
     def calculate_margin_pdf(self, X, mu , sigma, sigma2):
 
