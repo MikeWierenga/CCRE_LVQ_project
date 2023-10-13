@@ -63,8 +63,8 @@ class Main():
         # return average_distance
 
         # calculate the CRE
-        # cre_distance = cre.CRE(df)
-        # cre_distance.cre_gaussian_distribution()
+        cre_distance = cre.CRE(df.iloc[0, 2:])
+        cre_distance.cre_gaussian_distribution()
 
         # #calculating CCRE 
         print("VANAF HIER IS CCRE")
@@ -75,9 +75,16 @@ class Main():
         x= x.astype(np.float32)
         y = y.astype(np.float32)
 
-        data = np.concatenate((x,y), axis=1)
-        ccre_distance = ccre.CCRE(data.T)
+        mean_x = np.mean(x)
+        sigma2 = np.var(x)
+        sigma = np.sqrt(sigma2)
         
+        data = np.concatenate((y,x), axis=1)
+        ccre_distance = ccre.CCRE(data.T)
+        cov_conditional_dist = ccre_distance.cov_conditional_distribution() 
+   
+        print(integrate.dblquad(ccre_distance.calculate_expactation_value, -np.inf, np.inf, 0, np.inf, args=(mean_x, sigma, sigma2, cov_conditional_dist, cre_distance)))
+        return "lets stop here"
         range_of_y = np.sqrt(np.var(y)) * 4 #range for new entries to calculate the cre of Y|X X will remain constant
         # print(range_of_y)
         new_dx = np.linspace(0,0,1000000) #will remain a fixed value
@@ -85,12 +92,13 @@ class Main():
         # new_entry = np.array([0, 0])
         bivariate_PDF = []
         for index, _ in enumerate(new_dx):
-            new_entry = np.array([0, new_dy[index]])
+            new_entry = np.array([new_dy[index], 0])
             # print(ccre_distance.mean[0], ccre_distance.mean[1])
             result = ccre_distance.calculate_joint_dist(new_entry)
             bivariate_PDF.append(result)
         cre_YX = cre.CRE(bivariate_PDF)
         cre_YX.cre_gaussian_distribution()
+        
         # # test calculate marginal
         # marginal = ccre_distance.calculate_margin_pdf(result, np.mean(x), np.sqrt(np.var(x)), np.var(x))
         # print(marginal)

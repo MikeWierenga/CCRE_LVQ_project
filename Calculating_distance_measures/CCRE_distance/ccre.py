@@ -13,27 +13,25 @@ class CCRE:
         self.position_y = 0
         self.position_x = 1
         self.fit(data)
-        # print(f"{self.mean} \n {self.cov} \n {self.invcov} \n hi{self.detcov}")
+
 
     def fit(self, data):
         y = data[0, :]
         x = data[1, :]
-        print(np.mean(y))
+       
         self.mean = np.mean([y,x], axis=1)
 
         self.cov = np.cov(data)
         self.invcov = np.linalg.pinv(self.cov)
         self.detcov = np.linalg.det(self.cov)
-        # print(f"{self.mean} \n cov: {self.cov} \n {self.invcov} \n {self.detcov}")
+
 
     def calculate_joint_dist(self, new_entry):
         """
         based on the formula given on this website(05/10/2023): https://www.geeksforgeeks.org/visualizing-the-bivariate-gaussian-distribution-in-python/
         returns: 1x1 joint probability distribution function
         """
-        # split this function so that we keep the mu cov and invcov
-        
-        
+    
         first_part = (new_entry[:] - self.mean).reshape(-1,1).T
         last_part = first_part.T
         last_part = first_part.T
@@ -47,14 +45,17 @@ class CCRE:
         """
         Based on formula in book on statistics
         """
-        print(self.mean)
+       
         mean_y = self.mean[self.position_y]
         mean_x = self.mean[self.position_x]
         cov_yx = self.cov[self.position_y][self.position_x]
         inv_cov_xx = self.invcov[self.position_x][self.position_x]
-        x = self.data[1, :]
-        
-        mean_conditional = mean_y + cov_yx*inv_cov_xx*(x-mean_x) # this formula doesn't work yet i expect 1 value but get a vector
+        if type(self.data) == list or type(self.data) == np.array:
+
+            x = self.data[1, :]
+        else:
+            x = self.data
+        mean_conditional = mean_y + cov_yx*inv_cov_xx*(x-mean_x) 
         return mean_conditional
     
     def cov_conditional_distribution(self):
@@ -77,9 +78,20 @@ class CCRE:
         return formula
      
 
-    def calculate_expactation_value(self):
+    def calculate_expactation_value(self, y, x, mu, sigma, sigma2, cov, cre_class):
+        # expectation value E(X) = integral from -inf to inf of x * probability of x
+        # our case E(cre(Y|X)) = cre(Y|X) * pX(x)
+        if x < 0:
+            print(x)
+        self.data = x
         
-        pass
+        conditional_mean = self.mean_conditional_distribution()
+
+        cre = cre_class.cumulative_distribution(y, conditional_mean, cov) #this will be the function to calculate the cre
+
+        p = self.calculate_margin_pdf(x, mu, sigma, sigma2) # this will be the pdf function
+        formula = cre * p
+        return formula 
         
     def calculate_CCRE(self, entropy_X, expectation_value_YX):
         ccre = entropy_X - expectation_value_YX
