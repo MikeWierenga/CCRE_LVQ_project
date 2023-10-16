@@ -72,27 +72,34 @@ class CCRE:
         cov_conditional = cov_yy - cov_yx*invcov_xx*cov_xy
         return cov_conditional
 
-    def calculate_margin_pdf(self, X, mu , sigma, sigma2):
+    def calculate_margin_pdf(self, x, mu , sigma, sigma2):
 
-        formula = (1 / (np.sqrt(2*np.pi)* sigma)) * np.exp(-((X- mu)**2) / (2*sigma2)) 
+        formula = (1 / (np.sqrt(2*np.pi)* sigma)) * np.exp(-((x - mu)**2) / (2*sigma2)) 
+        
         return formula
      
 
     def calculate_expactation_value(self, y, x, mu, sigma, sigma2, cov, cre_class):
         # expectation value E(X) = integral from -inf to inf of x * probability of x
         # our case E(cre(Y|X)) = cre(Y|X) * pX(x)
-        if x < 0:
-            print(x)
         self.data = x
-        
         conditional_mean = self.mean_conditional_distribution()
-
-        cre = cre_class.cumulative_distribution(y, conditional_mean, cov) #this will be the function to calculate the cre
-
-        p = self.calculate_margin_pdf(x, mu, sigma, sigma2) # this will be the pdf function
-        formula = cre * p
-        return formula 
         
+        cre = cre_class.cumulative_distribution(y, conditional_mean, cov) #this will be the function to calculate the cre
+        p = self.calculate_margin_pdf(x, mu, sigma, sigma2) # this will be the pdf function
+        
+        formula = -cre * p
+        return formula 
+    
+    def calculate_expectation_value_xy(self, x, y, mu_y, sigma_y, sigma2_y, cov, cre_class):
+        self.data = y
+        conditional_mean = self.mean_conditional_distribution()
+        cre = cre_class.cumulative_distribution(y, conditional_mean, cov) #this will be the function to calculate the cre
+        p = self.calculate_margin_pdf(x, mu_y, sigma_y, sigma2_y) # this will be the pdf function
+        
+        formula = -cre * p
+        return formula 
+      
     def calculate_CCRE(self, entropy_X, expectation_value_YX):
         ccre = entropy_X - expectation_value_YX
         return ccre
