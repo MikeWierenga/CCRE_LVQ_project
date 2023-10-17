@@ -60,7 +60,7 @@ class CCRE:
     
     def cov_conditional_distribution(self):
         """
-        Calculating the covariance of the conditional distribution p(Y|X)
+        Calculating the covariance of the conditional distribution p(Y|X) based on book on statistics
         """
         
         
@@ -70,10 +70,10 @@ class CCRE:
         cov_xy = self.cov[self.position_x][self.position_y]
 
         cov_conditional = cov_yy - cov_yx*invcov_xx*cov_xy
+        
         return cov_conditional
 
     def calculate_margin_pdf(self, x, mu , sigma, sigma2):
-
         formula = (1 / (np.sqrt(2*np.pi)* sigma)) * np.exp(-((x - mu)**2) / (2*sigma2)) 
         
         return formula
@@ -86,11 +86,14 @@ class CCRE:
         conditional_mean = self.mean_conditional_distribution()
         
         cre = cre_class.cumulative_distribution(y, conditional_mean, cov) #this will be the function to calculate the cre
+      
         p = self.calculate_margin_pdf(x, mu, sigma, sigma2) # this will be the pdf function
-        
+      
         formula = -cre * p
         return formula 
     
+
+    # FOR TESTING 
     def calculate_expectation_value_xy(self, x, y, mu_y, sigma_y, sigma2_y, cov, cre_class):
         self.data = y
         conditional_mean = self.mean_conditional_distribution()
