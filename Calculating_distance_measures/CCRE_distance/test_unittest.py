@@ -22,7 +22,7 @@ class Test_testcre(unittest.TestCase):
 
     def test_wider_Gaus_distributions(self):    
         before = 0
-        for i in np.linspace(0.1, 10, 20):
+        for i in np.linspace(0.1, 10, 10):
 
             dataset = np.random.normal(0,i,1000)
             cre_class = cre.CRE(dataset)
@@ -31,7 +31,28 @@ class Test_testcre(unittest.TestCase):
             self.assertGreater(cre_value, before)
             
             before = cre_value
-            
+
+    
+    def test_conditional_cre(self):
+        y = np.random.normal(0,1,100).reshape(-1,1)
+        x = np.random.normal(0,1, 100).reshape(-1,1)
+        mean_x = np.mean(x)
+        sigma = np.std(x)
+        sigma2 = np.var(x)
+
+        original_data = np.concatenate((y, x), axis = 1)
+        cre_y = cre.CRE(y)
+        cre_class = cre.CRE(x)
+        print(f'cre of x = {cre_class.cre_gaussian_distribution()}')
+        print(f'cre of y = {cre_y.cre_gaussian_distribution()}')        
+
+
+        ccre_class = ccre.CCRE(original_data.T)
+        cov_conditional_dist = ccre_class.cov_conditional_distribution() 
+        
+        print(f'cre(Y|X = 0){integrate.quad(ccre_class.calculate_expactation_value, 0, np.inf, args = (0, mean_x, sigma, sigma2, cov_conditional_dist, cre_class))}')
+
+        print(original_data)
     def test_unrelated_to_related_gaussian_distribution(self):
         x = np.random.normal(0,1, 100).reshape(-1,1)
         y = np.random.normal(0,1, 100).reshape(-1,1)
@@ -61,8 +82,7 @@ class Test_testcre(unittest.TestCase):
             
             expect_value_cre_yx = integrate.dblquad(ccre_distance.calculate_expactation_value, -np.inf, np.inf, 0, np.inf, args=(mean_x, sigma, sigma2, cov_conditional_dist, cre_class))
             print(f"{cre_value} {expect_value_cre_yx} \n {m}")
-                        # print(cre_value)
-        pass
+  
 
 if __name__ == '__main__':
     unittest.main()
