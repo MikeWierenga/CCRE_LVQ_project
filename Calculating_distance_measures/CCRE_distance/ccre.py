@@ -18,9 +18,8 @@ class CCRE:
     def fit(self, data):
         y = data[0, :]
         x = data[1, :]
-       
+    
         self.mean = np.mean([y,x], axis=1)
-
         self.cov = np.cov(data)
         self.invcov = np.linalg.pinv(self.cov)
         self.detcov = np.linalg.det(self.cov)
@@ -47,7 +46,9 @@ class CCRE:
         """
        
         mean_y = self.mean[self.position_y]
+        
         mean_x = self.mean[self.position_x]
+  
         cov_yx = self.cov[self.position_y][self.position_x]
         inv_cov_xx = self.invcov[self.position_x][self.position_x]
         if type(self.data) == list or type(self.data) == np.array:
@@ -74,7 +75,7 @@ class CCRE:
         return cov_conditional
 
     def calculate_margin_pdf(self, x, mu , sigma, sigma2):
-        formula = (1 / (np.sqrt(2*np.pi)* sigma)) * np.exp(-((x - mu)**2) / (2*sigma2)) 
+        formula = (1 / (np.sqrt(2*np.pi)* sigma)) * np.exp(-(((x - mu)**2) / (2*sigma2))) 
         
         return formula
      
@@ -84,12 +85,11 @@ class CCRE:
         # our case E(cre(Y|X)) = cre(Y|X) * pX(x)
         self.data = x
         conditional_mean = self.mean_conditional_distribution()
-        
         cre = cre_class.cumulative_distribution(y, conditional_mean, cov) #this will be the function to calculate the cre
-      
+        
         p = self.calculate_margin_pdf(x, mu, sigma, sigma2) # this will be the pdf function
       
-        formula = -cre * p
+        formula = cre * p
         return formula 
     
 
@@ -100,7 +100,7 @@ class CCRE:
         cre = cre_class.cumulative_distribution(y, conditional_mean, cov) #this will be the function to calculate the cre
         p = self.calculate_margin_pdf(x, mu_y, sigma_y, sigma2_y) # this will be the pdf function
         
-        formula = -cre * p
+        formula = cre * p
         return formula 
       
     def calculate_CCRE(self, entropy_X, expectation_value_YX):
