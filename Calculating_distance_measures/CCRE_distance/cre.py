@@ -37,8 +37,8 @@ class CRE:
             log_errorfunction= 0 
         else:
 
-            # log_errorfunction = ss.norm.logsf(x, mu,sigma)
-            log_errorfunction = np.log(error_function)
+            log_errorfunction = ss.norm.logsf(x, mu,sigma)
+            # log_errorfunction = np.log(error_function)
         return error_function*log_errorfunction
     
 
