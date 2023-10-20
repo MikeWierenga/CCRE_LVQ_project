@@ -18,7 +18,6 @@ class CCRE:
     def fit(self, data):
         y = data[0, :]
         x = data[1, :]
-    
         self.mean = np.mean([y,x], axis=1)
         self.cov = np.cov(data)
         self.invcov = np.linalg.pinv(self.cov)
@@ -32,7 +31,6 @@ class CCRE:
         """
     
         first_part = (new_entry[:] - self.mean).reshape(-1,1).T
-        last_part = first_part.T
         last_part = first_part.T
         
         formula =  -(first_part@self.invcov@last_part)/2
@@ -50,7 +48,8 @@ class CCRE:
         mean_x = self.mean[self.position_x]
   
         cov_yx = self.cov[self.position_y][self.position_x]
-        inv_cov_xx = self.invcov[self.position_x][self.position_x]
+        
+        inv_cov_xx = 1/self.cov[self.position_x][self.position_x]
         if type(self.data) == list or type(self.data) == np.array:
 
             x = self.data[1, :]
@@ -67,7 +66,8 @@ class CCRE:
         
         cov_yy = self.cov[self.position_y][self.position_y]
         cov_yx = self.cov[self.position_y][self.position_x]
-        invcov_xx = self.invcov[self.position_x][self.position_x]
+       
+        invcov_xx = 1/self.cov[self.position_x][self.position_x]
         cov_xy = self.cov[self.position_x][self.position_y]
 
         cov_conditional = cov_yy - cov_yx*invcov_xx*cov_xy
@@ -75,7 +75,7 @@ class CCRE:
         return cov_conditional
 
     def calculate_margin_pdf(self, x, mu , sigma, sigma2):
-        formula = (1 / (np.sqrt(2*np.pi)* sigma)) * np.exp(-(((x - mu)**2) / (2*sigma2))) 
+        formula = stats.norm.pdf(x, mu, sigma)
         
         return formula
      
@@ -88,7 +88,8 @@ class CCRE:
         cre = cre_class.cumulative_distribution(y, conditional_mean, cov) #this will be the function to calculate the cre
         
         p = self.calculate_margin_pdf(x, mu, sigma, sigma2) # this will be the pdf function
-      
+        # test = np.e**(-(x-mu)**2/2*sigma2)
+        # # print(test)
         formula = cre * p
         return formula 
     
@@ -97,8 +98,8 @@ class CCRE:
     def calculate_expectation_value_xy(self, x, y, mu_y, sigma_y, sigma2_y, cov, cre_class):
         self.data = y
         conditional_mean = self.mean_conditional_distribution()
-        cre = cre_class.cumulative_distribution(y, conditional_mean, cov) #this will be the function to calculate the cre
-        p = self.calculate_margin_pdf(x, mu_y, sigma_y, sigma2_y) # this will be the pdf function
+        cre = cre_class.cumulative_distribution(x, conditional_mean, cov) #this will be the function to calculate the cre
+        p = self.calculate_margin_pdf(y, mu_y, sigma_y, sigma2_y) # this will be the pdf function
         
         formula = cre * p
         return formula 
