@@ -6,6 +6,7 @@ from sklearn.preprocessing import MinMaxScaler
 from scipy import special
 from scipy import integrate
 
+
 class CRE:
     """
     Calculates the CRE (cumulative residual entropy) value based on paper "Cumulative Residual Entropy: A New Meaure of Information" by Rao et al(2004)
@@ -26,7 +27,9 @@ class CRE:
 
         returns: float
         """
-        error_function = 1 - (0.5 * (1 + math.erf( (x-mu) / (sigma*np.sqrt(2)))))
+        error_function = ss.norm.sf(x, mu, sigma)
+        # error_function = 1 - (0.5 * (1 + math.erfc((x-mu) / (sigma*np.sqrt(2)))))
+        # error_function = 1 - (0.5 * (1 + math.erf( (x-mu) / (sigma*np.sqrt(2)))))
         if error_function <0:
             error_function = 0
             
@@ -34,8 +37,8 @@ class CRE:
             log_errorfunction= 0 
         else:
 
+            # log_errorfunction = ss.norm.logsf(x, mu,sigma)
             log_errorfunction = np.log(error_function)
-
         return error_function*log_errorfunction
     
 
