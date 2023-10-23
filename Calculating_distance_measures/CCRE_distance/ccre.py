@@ -85,7 +85,7 @@ class CCRE:
         """
         self.data = x
         conditional_mean = self.mean_conditional_distribution()
-        cre = cre_class.cumulative_distribution(y, conditional_mean, cov)
+        cre = cre_class.cumulative_distribution(y, conditional_mean, np.sqrt(cov))
         
         p = self.calculate_margin_pdf(x, mu, sigma, sigma2) 
         
@@ -100,7 +100,7 @@ class CCRE:
         """
         self.data = y
         conditional_mean = self.mean_conditional_distribution()
-        cre = cre_class.cumulative_distribution(x, conditional_mean, cov) 
+        cre = cre_class.cumulative_distribution(x, conditional_mean, np.sqrt(cov)) 
         p = self.calculate_margin_pdf(y, mu_y, sigma_y, sigma2_y) 
         
         formula = cre * p

@@ -64,130 +64,52 @@ class Main():
         # return average_distance
 
         # calculate the CRE
+        x = np.array(df.iloc[2, 2:-1]).astype(float).reshape(-1,1)
+        y = np.array(df.iloc[4, 2:-1]).astype(float).reshape(-1,1)
+        cre_x = cre.CRE(x)
+        cre_x_value = cre_x.cre_gaussian_distribution()
+        cre_y = cre.CRE(y)
+        cre_y_value = cre_y.cre_gaussian_distribution()
+        print(f'cre(x) = {cre_x_value} cre(y) = {cre_y_value}')
         
-        #TO TEST CORRELATION OF 2 DATASETS
-        x = np.array([[-0.06800444],
-        [ 0.16943253],
-        [ 2.42000786],
-        [-0.43541997],
-        [-0.8019287 ],
-        [-0.97924357],
-        [ 1.85310014],
-        [-0.11858712],
-        [-0.29550731],
-        [-1.46707809],
-        [-0.03476563],
-        [-1.42155007],
-        [ 0.2448333 ],
-        [ 0.8538168 ],
-        [ 0.9727146 ],
-        [-0.66576435],
-        [-0.48732568],
-        [ 0.15018597],
-        [ 0.17948517],
-        [-0.039039  ]])
-
-
-        y = np.array([[ 0.22147024],
-        [ 0.83070095],
-        [ 0.89207153],
-        [-0.70552404],
-        [ 0.72734723],
-        [-1.35638024],
-        [-0.85044476],
-        [ 1.1530766 ],
-        [ 2.22923693],
-        [-1.44447676],
-        [-0.51559235],
-        [ 0.83248201],
-        [ 0.60668853],
-        [ 0.91990303],
-        [ 1.64502999],
-        [-0.51957907],
-        [ 0.78325817],
-        [ 1.7536485 ],
-        [ 0.97921261],
-        [ 0.42252685]])
-        original_data = np.concatenate((x,y), axis=1)
-        # print(data[:, 0].shape)
-
-      
-        for i in np.linspace(0,1, 10):
-            i = round(i, 2)
-            print(i)
-            M = np.array([[1,i], [i,1]])
-            data = np.dot(original_data, M)
-            x = data[:, 0].reshape(-1,1)
-            y = data[:,1].reshape(-1,1)
-            
-            mean_x = np.mean(x)
-            sigma2 = np.var(x)
-            sigma = np.sqrt(sigma2)
-            
-            data = np.concatenate((y,x), axis=1)
-         
-            cre_distance = cre.CRE(x)
-            cre_distance.cre_gaussian_distribution()
-            ccre_distance = ccre.CCRE(data.T)
-          
-            
-            cov_conditional_dist = ccre_distance.cov_conditional_distribution() 
-            
-            print(integrate.dblquad(ccre_distance.calculate_expactation_value, -np.inf, np.inf, 0, np.inf, args=(mean_x, sigma, sigma2, cov_conditional_dist, cre_distance)))
-            break
         
-        #TO TEST X|Y AND Y|X
-        # for i in range(len(df)):
-        #     cre_distance = cre.CRE(df.iloc[i, 2:-1])
-        #     # cre_distance.calculate_cre()
-        #     cre_distance.cre_gaussian_distribution()
+        #calculate expectation value Y|X
+        mean_x = np.mean(x)
+        sigma = np.std(x)
+        print(sigma)
+        sigma2 = np.var(x)
 
-        #     # #calculating CCRE 
-        #     x = df.iloc[i, 2:-1]
-        #     y = df.iloc[i, 2:-1]
-        #     x = np.array(x).reshape(-1,1)
-        #     y =np.array(y).reshape(-1,1)
-        #     x= x.astype(np.float32)
-        #     y = y.astype(np.float32)
+        new_data= np.concatenate((y, x), axis = 1)
 
-        #     mean_x = np.mean(x)
-        #     sigma2 = np.var(x)
-        #     sigma = np.sqrt(sigma2)
-
-        #     data = np.concatenate((y,x), axis=1)
-        #     ccre_distance = ccre.CCRE(data.T)
-         
-        #     cov_conditional_dist = ccre_distance.cov_conditional_distribution() 
+        ccre_distance = ccre.CCRE(new_data.T)
+        cov_conditional_dist = ccre_distance.cov_conditional_distribution() 
+        expect_value_cre_yx = integrate.dblquad(ccre_distance.calculate_expectation_value, -np.inf, np.inf, 0, np.inf, args=(mean_x, sigma, sigma2, cov_conditional_dist, cre_x))
+        print(f'E[e[Y|X]] = {expect_value_cre_yx}')
+        # print(f'CCRE(e(X) - E[e[Y|X]]) {(cre_x_value + expect_value_cre_yx[0]) / cre_x_value}') 
         
-        #     print(integrate.dblquad(ccre_distance.calculate_expactation_value, -np.inf, np.inf, 0, np.inf, args=(mean_x, sigma, sigma2, cov_conditional_dist, cre_distance)))
+        
+        #calculate expectation value X|Y
+        mean_y = np.mean(y)
+        sigma_y = np.std(y)
+        print(sigma_y)
+        sigma2_y = np.var(y)
+
+        new_data= np.concatenate((x, y), axis = 1)
+    
+        ccre_distance = ccre.CCRE(new_data.T)
+        cov_conditional_dist = ccre_distance.cov_conditional_distribution() 
+        expect_value_cre_xy = integrate.dblquad(ccre_distance.calculate_expectation_value_xy, -np.inf, np.inf, 0, np.inf, args=(mean_y, sigma_y, sigma2_y, cov_conditional_dist, cre_x))
+        print(f'E[e[Y|X]] = {expect_value_cre_xy}')
+        print(f"ccre(X - Y|X) = {(cre_x_value + (expect_value_cre_yx[0]))/cre_x_value}\n")
             
-        #     #test_x given y
-        #     mean_y = np.mean(y)
-        #     sigma2_y = np.var(y)
-        #     sigma_y = np.sqrt(sigma2_y)
-        #     data = np.concatenate((x,y), axis=1)
-        #     ccre_distance = ccre.CCRE(data.T)
-        #     cov_conditional_dist = ccre_distance.cov_conditional_distribution() 
-        #     print(integrate.dblquad(ccre_distance.calculate_expectation_value_xy, -np.inf, np.inf, 0, np.inf, args=(mean_y, sigma_y, sigma2_y, cov_conditional_dist, cre_distance)))
-        #     print(i)
-        return "lets stop here"
-        range_of_y = np.sqrt(np.var(y)) * 4 #range for new entries to calculate the cre of Y|X X will remain constant
-        # print(range_of_y)
-        new_dx = np.linspace(0,0,1000000) #will remain a fixed value
-        new_dy = np.linspace(-range_of_y, range_of_y, 1000000) #between 4 * standard deviation of y
-        # new_entry = np.array([0, 0])
-        bivariate_PDF = []
-        for index, _ in enumerate(new_dx):
-            new_entry = np.array([new_dy[index], 0])
-            # print(ccre_distance.mean[0], ccre_distance.mean[1])
-            result = ccre_distance.calculate_joint_dist(new_entry)
-            bivariate_PDF.append(result)
-        cre_YX = cre.CRE(bivariate_PDF)
-        cre_YX.cre_gaussian_distribution()
-        
-        # # test calculate marginal
-        # marginal = ccre_distance.calculate_margin_pdf(result, np.mean(x), np.sqrt(np.var(x)), np.var(x))
-        # print(marginal)
+        print(f"ccre(X - X|Y) = {(cre_x_value + (expect_value_cre_xy[0]))/cre_x_value}\n")
+        print(f"ccre(Y - Y|X) = {(cre_y_value + (expect_value_cre_yx[0]))/cre_y_value}\n")
+        print(f"ccre(Y - X|Y) = {(cre_y_value + (expect_value_cre_xy[0]))/cre_y_value}\n")
+
+        plt.scatter(x, y)
+        plt.show()
+    
+       
   
     
    
