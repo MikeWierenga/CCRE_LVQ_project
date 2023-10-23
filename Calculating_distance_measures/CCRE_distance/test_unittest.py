@@ -81,19 +81,19 @@ class Test_testcre(unittest.TestCase):
         
        
     def test_unrelated_to_related_gaussian_distribution(self):
-        x = np.random.normal(0,1, 100).reshape(-1,1)
+        x = np.random.normal(0,3, 100).reshape(-1,1)
         y = np.random.normal(0,1, 100).reshape(-1,1)
         original_data = np.concatenate((x,y), axis=1)
        
         
-        for i in np.linspace(0.01, 1, 100):
+        for i in np.linspace(0.01, 1, 10):
             print(f'PERCENTAGE = {i}')
             m = np.array([[1,0], [np.sin(np.pi/2*i),np.cos(np.pi/2*i)]]).T
             
             new_data = np.dot(original_data, m)
           
             new_x = new_data[:, 0].reshape(-1,1)
-            # print(new_x.shape)
+          
             
             mean_x = np.mean(new_x)
             sigma = np.std(new_x)
@@ -101,6 +101,7 @@ class Test_testcre(unittest.TestCase):
         
 
             new_y = new_data[:, 1].reshape(-1,1)
+           
             
             new_data= np.concatenate((new_y, new_x), axis = 1)
             
@@ -112,10 +113,23 @@ class Test_testcre(unittest.TestCase):
             
             ccre_distance = ccre.CCRE(new_data.T)
             cov_conditional_dist = ccre_distance.cov_conditional_distribution() 
-            expect_value_cre_yx = integrate.dblquad(ccre_distance.calculate_expactation_value, -np.inf, np.inf, 0, np.inf, args=(mean_x, sigma, sigma2, cov_conditional_dist, cre_class))
-           
-            print(f"cre(X) = {cre_value} cre(Y){cre_y_value} E[e(Y|X)]{expect_value_cre_yx[0]}")
-            print(f"ccre = {(cre_value + (expect_value_cre_yx[0]))/cre_value}\n")
-
+            expect_value_cre_yx = integrate.dblquad(ccre_distance.calculate_expectation_value, -np.inf, np.inf, 0, np.inf, args=(mean_x, sigma, sigma2, cov_conditional_dist, cre_class))
+            
+            mean_x = np.mean(new_y)
+            sigma = np.std(new_y)
+            sigma2 = np.var(new_y)
+            new_data= np.concatenate((new_x, new_y), axis = 1)
+            ccre_distance = ccre.CCRE(new_data.T)
+            cov_conditional_dist = ccre_distance.cov_conditional_distribution()
+            expected_value_cre_xy = integrate.dblquad(ccre_distance.calculate_expectation_value_xy, -np.inf, np.inf, 0, np.inf, args=(mean_x, sigma, sigma2, cov_conditional_dist, cre_class))
+            
+            print(f"cre(X) = {cre_value} cre(Y){cre_y_value} E[e(Y|X)]{expect_value_cre_yx[0]} E[e(X|Y)] {expected_value_cre_xy[0]}")
+            print(f"ccre(X - Y|X) = {(cre_value + (expect_value_cre_yx[0]))/cre_value}\n")
+            
+            print(f"ccre(X - X|Y) = {(cre_value + (expected_value_cre_xy[0]))/cre_value}\n")
+            print(f"ccre(Y - Y|X) = {(cre_y_value + (expect_value_cre_yx[0]))/cre_y_value}\n")
+            print(f"ccre(Y - X|Y) = {(cre_y_value + (expected_value_cre_xy[0]))/cre_y_value}\n")
+            plt.scatter(new_x, new_y)
+            plt.show()
 if __name__ == '__main__':
     unittest.main()
