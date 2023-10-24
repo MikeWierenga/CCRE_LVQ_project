@@ -10,11 +10,14 @@ import numpy as np
 sys.path.append('/home/fcourse1/Desktop/afstudeerstage/code/CCRE_LVQ_project/Calculating_distance_measures/CCRE_distance')
 import cre 
 import ccre
+sys.path.append('/home/fcourse1/Desktop/afstudeerstage/code/CCRE_LVQ_project/Calculating_distance_measures/neighbours')
+import neighbours
 import pandas as pd
 from sklearn import preprocessing
 import scipy.integrate as integrate
 import matplotlib.pyplot as plt
 from scipy.stats import norm
+
 class Main():
 
     def __init__(self, hospital, diagnosis):
@@ -64,6 +67,51 @@ class Main():
         # return average_distance
 
         # calculate the CRE
+        connection = neighbours.neighbours(df)
+        ccre_distances_values = []
+        for i in connection.connect_neighbours():
+            print(i)
+            x = np.array(df.iloc[i[0], 2:-1]).astype(float).reshape(-1,1)
+            y = np.array(df.iloc[i[1], 2:-1]).astype(float).reshape(-1,1)
+            cre_x = cre.CRE(x)
+            cre_x_value = cre_x.cre_gaussian_distribution()
+            cre_y = cre.CRE(y)
+            cre_y_value = cre_y.cre_gaussian_distribution()
+            print(f'cre(x) = {cre_x_value} cre(y) = {cre_y_value}')
+            
+            
+            #calculate expectation value Y|X
+            # mean_x = np.mean(x)
+            # sigma = np.std(x)
+            # sigma2 = np.var(x)
+
+            # new_data= np.concatenate((x, y), axis = 1)
+
+            # ccre_distance = ccre.CCRE(new_data.T)
+            # cov_conditional_dist = ccre_distance.cov_conditional_distribution() 
+            # expect_value_cre_yx = integrate.dblquad(ccre_distance.calculate_expectation_value, -np.inf, np.inf, 0, np.inf, args=(mean_x, sigma, sigma2, cov_conditional_dist, cre_x))
+            # print(f'E[e[Y|X]] = {expect_value_cre_yx}')
+        
+            # print(f"ccre(X - Y|X) = {(cre_x_value + (expect_value_cre_yx[0]))/cre_x_value}\n")
+                
+            #calculate expecation value X|Y
+            mean_y = np.mean(y)
+            sigma_y = np.std(y)
+            sigma2_y = np.var(y)
+
+            new_data= np.concatenate((x, y), axis = 1)
+
+            ccre_distance = ccre.CCRE(new_data.T)
+            cov_conditional_dist = ccre_distance.cov_conditional_distribution() 
+            expect_value_cre_xy = integrate.dblquad(ccre_distance.calculate_expectation_value_xy, -np.inf, np.inf, 0, np.inf, args=(mean_y, sigma_y, sigma2_y, cov_conditional_dist, cre_x))
+            print(f'E[e[X|Y]] = {expect_value_cre_xy}')
+            print(f"ccre(X - X|Y) = {(cre_x_value + (expect_value_cre_xy[0]))/cre_x_value}\n")
+            ccre_value = (cre_x_value + (expect_value_cre_xy[0]))/cre_x_value
+            if ccre_value < 0:
+                print(ccre_value)
+                ccre_value = 0
+            ccre_distances_values.append(ccre_value)
+        return sum(ccre_distances_values)/len(ccre_distances_values)
         x = np.array(df.iloc[2, 2:-1]).astype(float).reshape(-1,1)
         y = np.array(df.iloc[4, 2:-1]).astype(float).reshape(-1,1)
         cre_x = cre.CRE(x)
@@ -76,35 +124,29 @@ class Main():
         #calculate expectation value Y|X
         mean_x = np.mean(x)
         sigma = np.std(x)
-        print(sigma)
         sigma2 = np.var(x)
 
-        new_data= np.concatenate((y, x), axis = 1)
+        new_data= np.concatenate((x, y), axis = 1)
 
         ccre_distance = ccre.CCRE(new_data.T)
         cov_conditional_dist = ccre_distance.cov_conditional_distribution() 
         expect_value_cre_yx = integrate.dblquad(ccre_distance.calculate_expectation_value, -np.inf, np.inf, 0, np.inf, args=(mean_x, sigma, sigma2, cov_conditional_dist, cre_x))
         print(f'E[e[Y|X]] = {expect_value_cre_yx}')
-        # print(f'CCRE(e(X) - E[e[Y|X]]) {(cre_x_value + expect_value_cre_yx[0]) / cre_x_value}') 
-        
-        
-        #calculate expectation value X|Y
+       
+        print(f"ccre(X - Y|X) = {(cre_x_value + (expect_value_cre_yx[0]))/cre_x_value}\n")
+            
+        #calculate expecation value X|Y
         mean_y = np.mean(y)
         sigma_y = np.std(y)
-        print(sigma_y)
         sigma2_y = np.var(y)
 
         new_data= np.concatenate((x, y), axis = 1)
-    
+
         ccre_distance = ccre.CCRE(new_data.T)
         cov_conditional_dist = ccre_distance.cov_conditional_distribution() 
         expect_value_cre_xy = integrate.dblquad(ccre_distance.calculate_expectation_value_xy, -np.inf, np.inf, 0, np.inf, args=(mean_y, sigma_y, sigma2_y, cov_conditional_dist, cre_x))
         print(f'E[e[Y|X]] = {expect_value_cre_xy}')
-        print(f"ccre(X - Y|X) = {(cre_x_value + (expect_value_cre_yx[0]))/cre_x_value}\n")
-            
-        print(f"ccre(X - X|Y) = {(cre_x_value + (expect_value_cre_xy[0]))/cre_x_value}\n")
-        print(f"ccre(Y - Y|X) = {(cre_y_value + (expect_value_cre_yx[0]))/cre_y_value}\n")
-        print(f"ccre(Y - X|Y) = {(cre_y_value + (expect_value_cre_xy[0]))/cre_y_value}\n")
+        print(f"ccre(X - Y|X) = {(cre_x_value + (expect_value_cre_xy[0]))/cre_x_value}\n")
 
         plt.scatter(x, y)
         plt.show()
