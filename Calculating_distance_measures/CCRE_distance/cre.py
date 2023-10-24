@@ -11,7 +11,7 @@ class CRE:
     def __init__(self, data):
         self.data = data
      
-    # CRE WITH GAUSSIAN DISTRIBUTION
+    
     def cumulative_distribution(self, x, mu, sigma):
         """
         Calculates the cumulative distribution which is needed to calculate the cre of a variable x Rao et al(2004)
@@ -25,7 +25,7 @@ class CRE:
         returns: float
         """
         error_function = 1- ss.norm.cdf(x, mu, sigma)
-            
+        
         if error_function <= 0:
             log_errorfunction= 0 
         else:
@@ -41,6 +41,7 @@ class CRE:
         returns: positive float value
         """
         data = np.array(self.data)
+        
         sigma = np.sqrt(np.var(data))
         mu = np.mean(data)
         
