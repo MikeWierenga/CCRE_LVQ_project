@@ -63,7 +63,7 @@ class CCRE:
         """
         cov_yy = self.cov[self.position_y][self.position_y]
         cov_yx = self.cov[self.position_y][self.position_x]
-       
+        
         invcov_xx = 1/self.cov[self.position_x][self.position_x]
         cov_xy = self.cov[self.position_x][self.position_y]
 
@@ -71,7 +71,7 @@ class CCRE:
         
         return cov_conditional
 
-    def calculate_margin_pdf(self, x, mu , sigma, sigma2):
+    def calculate_margin_pdf(self, x, mu , sigma):
         formula = stats.norm.pdf(x, mu, sigma)
         
         return formula
@@ -87,21 +87,22 @@ class CCRE:
         conditional_mean = self.mean_conditional_distribution()
         cre = cre_class.cumulative_distribution(y, conditional_mean, np.sqrt(cov))
         
-        p = self.calculate_margin_pdf(x, mu, sigma, sigma2) 
+        
+        p = self.calculate_margin_pdf(x, mu, sigma) 
         
         formula = cre * p
         return formula 
     
 
     
-    def calculate_expectation_value_xy(self, y, x, mu_y, sigma_y, sigma2_y, cov, cre_class):
+    def calculate_expectation_value_xy(self, x, y, mu_y, sigma_y, sigma2_y, cov, cre_class):
         """
         Calculates the expectation value of cre(X|Y)
         """
         self.data = y
         conditional_mean = self.mean_conditional_distribution()
         cre = cre_class.cumulative_distribution(x, conditional_mean, np.sqrt(cov)) 
-        p = self.calculate_margin_pdf(y, mu_y, sigma_y, sigma2_y) 
+        p = self.calculate_margin_pdf(y, mu_y, sigma_y) 
         
         formula = cre * p
         return formula 
