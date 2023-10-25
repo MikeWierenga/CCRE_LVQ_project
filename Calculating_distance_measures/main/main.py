@@ -51,10 +51,10 @@ class Main():
         if not os.path.isfile(f"euclidean_distances.csv"):
             
             euclidean_file = csv_file.CSV(f"euclidean_distances.csv")
-            header = ["id_x", "id_y", "hospital", "diagnosis", "euclidean"]
+            header = ["id_x", "id_y", "hospital", "diagnosis", "euclidean_distance", "euclidean_similarity"]
             euclidean_file.write_to_csv_file(header)
 
-        # calculate the CRE
+        # connect rows
         connection = neighbours.neighbours(df)
         ccre_distances_values = []
         for i in connection.connect_neighbours():
@@ -65,7 +65,8 @@ class Main():
             # Calculating euclidean distance
             eu_distance = euclidean_distance.Euclidean_Distance()
             euclidean_value = eu_distance.measure_distance(x, y)
-            
+            euclidean_similarity_value = eu_distance.calculate_similarity(euclidean_value)
+
             # Caluclating CRE
             cre_x = cre.CRE(x)
             cre_x_value = cre_x.cre_gaussian_distribution()
@@ -93,9 +94,10 @@ class Main():
             # write to csv files
             ccre_data = [df.index[i[0]], df.index[i[1]],self.hospital, self.diagnosis, cre_x_value, cre_y_value, expect_value_cre_xy[0], ccre_value]
             ccre_file.write_to_csv_file(ccre_data)
-            euclidean_data = [df.index[i[0]], df.index[i[1]],self.hospital, self.diagnosis, euclidean_value]
+            euclidean_data = [df.index[i[0]], df.index[i[1]],self.hospital, self.diagnosis, euclidean_value, euclidean_similarity_value]
             euclidean_file.write_to_csv_file(euclidean_data)
-        return sum(ccre_distances_values)/len(ccre_distances_values)
+        
+        
         
 hospitals = ["UMCG", "CUN", "UGOSM"]
 diagnosis = ["HC", "AD", "PD"]
