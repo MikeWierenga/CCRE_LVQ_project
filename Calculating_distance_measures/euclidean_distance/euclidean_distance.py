@@ -4,19 +4,6 @@ class Euclidean_Distance:
     def __init__(self, hospital, diagnosis):
         self.hospital = hospital
         self.diagnosis = diagnosis
-        
-
-    def connect_rows(self, df):
-        connections = []
-        for i in range(len(df)):
-            for j in range(len(df)):
-                if i == j:
-                    continue
-
-                if [i, j][::-1] in connections:
-                    continue
-                connections.append([i, j])
-        return connections
 
     def measure_distance(self, a, b):
         """"
@@ -51,8 +38,3 @@ class Euclidean_Distance:
         return average
 
 
-# a = [1,2,3]
-# b = [1,1,1]
-# test = Euclidean_Distance("UMCG", "HC")
-# test.locate_neighbors()
-# print(test.measure_distance(a,b))
