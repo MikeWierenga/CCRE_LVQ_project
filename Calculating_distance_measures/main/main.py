@@ -1,5 +1,6 @@
 
 import sys
+import os
 sys.path.append('/home/fcourse1/Desktop/afstudeerstage/code/CCRE_LVQ_project/Calculating_distance_measures/data')
 
 
@@ -12,6 +13,8 @@ import cre
 import ccre
 sys.path.append('/home/fcourse1/Desktop/afstudeerstage/code/CCRE_LVQ_project/Calculating_distance_measures/neighbours')
 import neighbours
+sys.path.append('/home/fcourse1/Desktop/afstudeerstage/code/CCRE_LVQ_project/Calculating_distance_measures/write_to_csv')
+import csv_file
 import pandas as pd
 from sklearn import preprocessing
 import scipy.integrate as integrate
@@ -38,6 +41,14 @@ class Main():
 
         df = data.combine_dataframes(center, diagnosis, feature_vectors)
         df = df[(df['center_label'] == self.hospital) & (df['diagnosis_label'] == self.diagnosis)]
+
+        # create csv file
+        if not os.path.isfile(f"CCRE_distances.csv"):
+
+            ccre_file = csv_file.CSV(f"CCRE_CCRE_distances.csv")
+            header = ["id_x", "id_y", "hospital", "diagnosis", "cre(x)", "cre(y)", "E[cre(X|Y)]", "ccre(X|Y)"]
+            ccre_file.write_to_csv_file(header)
+        
         #normalizing the data(everything is between 0 and 1)
         # df_labels = df.iloc[:, :2]
         # x = df.iloc[:, 2:].values
@@ -73,14 +84,15 @@ class Main():
             print(i)
             x = np.array(df.iloc[i[0], 2:-1]).astype(float).reshape(-1,1)
             y = np.array(df.iloc[i[1], 2:-1]).astype(float).reshape(-1,1)
+            
             cre_x = cre.CRE(x)
             cre_x_value = cre_x.cre_gaussian_distribution()
             cre_y = cre.CRE(y)
             cre_y_value = cre_y.cre_gaussian_distribution()
-            print(f'cre(x) = {cre_x_value} cre(y) = {cre_y_value}')
+          
             
             
-            #calculate expectation value Y|X
+            # # calculate expectation value Y|X
             # mean_x = np.mean(x)
             # sigma = np.std(x)
             # sigma2 = np.var(x)
@@ -104,13 +116,15 @@ class Main():
             ccre_distance = ccre.CCRE(new_data.T)
             cov_conditional_dist = ccre_distance.cov_conditional_distribution() 
             expect_value_cre_xy = integrate.dblquad(ccre_distance.calculate_expectation_value_xy, -np.inf, np.inf, 0, np.inf, args=(mean_y, sigma_y, sigma2_y, cov_conditional_dist, cre_x))
-            print(f'E[e[X|Y]] = {expect_value_cre_xy}')
-            print(f"ccre(X - X|Y) = {(cre_x_value + (expect_value_cre_xy[0]))/cre_x_value}\n")
+   
             ccre_value = (cre_x_value + (expect_value_cre_xy[0]))/cre_x_value
             if ccre_value < 0:
-                print(ccre_value)
-                ccre_value = 0
+              
+                ccre_value = abs(ccre_value)
+            
             ccre_distances_values.append(ccre_value)
+            data = [df.index[i[0]], df.index[i[1]],self.hospital, self.diagnosis, cre_x_value, cre_y_value, expect_value_cre_xy[0], ccre_value]
+            ccre_file.write_to_csv_file(data)
         return sum(ccre_distances_values)/len(ccre_distances_values)
         x = np.array(df.iloc[2, 2:-1]).astype(float).reshape(-1,1)
         y = np.array(df.iloc[4, 2:-1]).astype(float).reshape(-1,1)
@@ -166,4 +180,4 @@ diagnosis = ["HC", "AD", "PD"]
 #         if (hospital == "CUN") & (diagnosi == "AD"):
 #             continue
 #         print(f"{hospital} {diagnosi}: {Main(hospital, diagnosi).main()}")
-Main("UMCG", "AD").main()
+Main("CUN", "HC").main()
