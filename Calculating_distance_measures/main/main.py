@@ -44,38 +44,15 @@ class Main():
 
         # create csv file
         if not os.path.isfile(f"CCRE_distances.csv"):
-
-            ccre_file = csv_file.CSV(f"CCRE_CCRE_distances.csv")
+            
+            ccre_file = csv_file.CSV(f"CCRE_distances.csv")
             header = ["id_x", "id_y", "hospital", "diagnosis", "cre(x)", "cre(y)", "E[cre(X|Y)]", "ccre(X|Y)"]
             ccre_file.write_to_csv_file(header)
-        
-        #normalizing the data(everything is between 0 and 1)
-        # df_labels = df.iloc[:, :2]
-        # x = df.iloc[:, 2:].values
-        # scaler = preprocessing.MinMaxScaler(feature_range=(0,1)).fit_transform(x)
-
-        # df_scaled = pd.DataFrame(scaler)
-        
-        # dataframes = [df_labels, df_scaled]
-        # df = pd.concat(dataframes, axis=1)
-
-        # # calculating the Euclidean distance
-        # eu_distance = euclidean_distance.Euclidean_Distance(self.hospital, self.diagnosis)
-
-        # # get dataframe that only consists of with the labels mentioned above
-        # specific_df = df[(df['center_label'] == eu_distance.hospital) & (df['diagnosis_label'] == eu_distance.diagnosis)]
-
-        # # connect all rows with eachother and make sure there are no duplicates
-        # connections = eu_distance.connect_rows(specific_df)
-        # distances = []
-        # for i in connections:
-        #     position1 = np.array(specific_df.iloc[i[0]][2:])
-        #     position2 = np.array(specific_df.iloc[i[1]][2:])
-        #     distances.append(eu_distance.measure_distance(position1, position2))
-        # print(distances)
-        # # calculate average distance
-        # average_distance = eu_distance.calculate_average(distances)
-        # return average_distance
+        if not os.path.isfile(f"euclidean_distances.csv"):
+            
+            euclidean_file = csv_file.CSV(f"euclidean_distances.csv")
+            header = ["id_x", "id_y", "hospital", "diagnosis", "euclidean"]
+            euclidean_file.write_to_csv_file(header)
 
         # calculate the CRE
         connection = neighbours.neighbours(df)
@@ -85,27 +62,16 @@ class Main():
             x = np.array(df.iloc[i[0], 2:-1]).astype(float).reshape(-1,1)
             y = np.array(df.iloc[i[1], 2:-1]).astype(float).reshape(-1,1)
             
+            # Calculating euclidean distance
+            eu_distance = euclidean_distance.Euclidean_Distance()
+            euclidean_value = eu_distance.measure_distance(x, y)
+            
+            # Caluclating CRE
             cre_x = cre.CRE(x)
             cre_x_value = cre_x.cre_gaussian_distribution()
             cre_y = cre.CRE(y)
             cre_y_value = cre_y.cre_gaussian_distribution()
-          
-            
-            
-            # # calculate expectation value Y|X
-            # mean_x = np.mean(x)
-            # sigma = np.std(x)
-            # sigma2 = np.var(x)
 
-            # new_data= np.concatenate((x, y), axis = 1)
-
-            # ccre_distance = ccre.CCRE(new_data.T)
-            # cov_conditional_dist = ccre_distance.cov_conditional_distribution() 
-            # expect_value_cre_yx = integrate.dblquad(ccre_distance.calculate_expectation_value, -np.inf, np.inf, 0, np.inf, args=(mean_x, sigma, sigma2, cov_conditional_dist, cre_x))
-            # print(f'E[e[Y|X]] = {expect_value_cre_yx}')
-        
-            # print(f"ccre(X - Y|X) = {(cre_x_value + (expect_value_cre_yx[0]))/cre_x_value}\n")
-                
             #calculate expecation value X|Y
             mean_y = np.mean(y)
             sigma_y = np.std(y)
@@ -123,61 +89,20 @@ class Main():
                 ccre_value = abs(ccre_value)
             
             ccre_distances_values.append(ccre_value)
-            data = [df.index[i[0]], df.index[i[1]],self.hospital, self.diagnosis, cre_x_value, cre_y_value, expect_value_cre_xy[0], ccre_value]
-            ccre_file.write_to_csv_file(data)
-        return sum(ccre_distances_values)/len(ccre_distances_values)
-        x = np.array(df.iloc[2, 2:-1]).astype(float).reshape(-1,1)
-        y = np.array(df.iloc[4, 2:-1]).astype(float).reshape(-1,1)
-        cre_x = cre.CRE(x)
-        cre_x_value = cre_x.cre_gaussian_distribution()
-        cre_y = cre.CRE(y)
-        cre_y_value = cre_y.cre_gaussian_distribution()
-        print(f'cre(x) = {cre_x_value} cre(y) = {cre_y_value}')
-        
-        
-        #calculate expectation value Y|X
-        mean_x = np.mean(x)
-        sigma = np.std(x)
-        sigma2 = np.var(x)
-
-        new_data= np.concatenate((x, y), axis = 1)
-
-        ccre_distance = ccre.CCRE(new_data.T)
-        cov_conditional_dist = ccre_distance.cov_conditional_distribution() 
-        expect_value_cre_yx = integrate.dblquad(ccre_distance.calculate_expectation_value, -np.inf, np.inf, 0, np.inf, args=(mean_x, sigma, sigma2, cov_conditional_dist, cre_x))
-        print(f'E[e[Y|X]] = {expect_value_cre_yx}')
-       
-        print(f"ccre(X - Y|X) = {(cre_x_value + (expect_value_cre_yx[0]))/cre_x_value}\n")
             
-        #calculate expecation value X|Y
-        mean_y = np.mean(y)
-        sigma_y = np.std(y)
-        sigma2_y = np.var(y)
-
-        new_data= np.concatenate((x, y), axis = 1)
-
-        ccre_distance = ccre.CCRE(new_data.T)
-        cov_conditional_dist = ccre_distance.cov_conditional_distribution() 
-        expect_value_cre_xy = integrate.dblquad(ccre_distance.calculate_expectation_value_xy, -np.inf, np.inf, 0, np.inf, args=(mean_y, sigma_y, sigma2_y, cov_conditional_dist, cre_x))
-        print(f'E[e[Y|X]] = {expect_value_cre_xy}')
-        print(f"ccre(X - Y|X) = {(cre_x_value + (expect_value_cre_xy[0]))/cre_x_value}\n")
-
-        plt.scatter(x, y)
-        plt.show()
-    
-       
-  
-    
-   
-        
-     
+            # write to csv files
+            ccre_data = [df.index[i[0]], df.index[i[1]],self.hospital, self.diagnosis, cre_x_value, cre_y_value, expect_value_cre_xy[0], ccre_value]
+            ccre_file.write_to_csv_file(ccre_data)
+            euclidean_data = [df.index[i[0]], df.index[i[1]],self.hospital, self.diagnosis, euclidean_value]
+            euclidean_file.write_to_csv_file(euclidean_data)
+        return sum(ccre_distances_values)/len(ccre_distances_values)
         
 hospitals = ["UMCG", "CUN", "UGOSM"]
 diagnosis = ["HC", "AD", "PD"]
 
-# for hospital in hospitals:
-#     for diagnosi in diagnosis:
-#         if (hospital == "CUN") & (diagnosi == "AD"):
-#             continue
-#         print(f"{hospital} {diagnosi}: {Main(hospital, diagnosi).main()}")
-Main("CUN", "HC").main()
+for hospital in hospitals:
+    for diagnosi in diagnosis:
+        if (hospital == "CUN") & (diagnosi == "AD"):
+            continue
+        Main(hospital, diagnosi).main()
+
