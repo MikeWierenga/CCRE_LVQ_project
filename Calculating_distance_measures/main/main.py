@@ -1,6 +1,7 @@
 
 import sys
 import os
+import csv
 sys.path.append('/home/fcourse1/Desktop/afstudeerstage/code/CCRE_LVQ_project/Calculating_distance_measures/data')
 
 
@@ -26,8 +27,9 @@ class Main():
     def __init__(self, hospital, diagnosis):
         self.hospital = hospital
         self.diagnosis = diagnosis
-    
-
+        self.created_cre_file = False
+        self.created_euclidean_file = False
+        
     def main(self):
         # loading the data
         data = load_data.Load_Data()
@@ -48,17 +50,21 @@ class Main():
             ccre_file = csv_file.CSV(f"CCRE_distances.csv")
             header = ["id_x", "id_y", "hospital", "diagnosis", "cre(x)", "cre(y)", "E[cre(X|Y)]", "ccre(X|Y)"]
             ccre_file.write_to_csv_file(header)
+        else:
+        
+            self.created_cre_file = True
         if not os.path.isfile(f"euclidean_distances.csv"):
             
             euclidean_file = csv_file.CSV(f"euclidean_distances.csv")
             header = ["id_x", "id_y", "hospital", "diagnosis", "euclidean_distance", "euclidean_similarity"]
             euclidean_file.write_to_csv_file(header)
-
+        else:
+            self.created_euclidean_file = True
+         
         # connect rows
         connection = neighbours.neighbours(df)
-        ccre_distances_values = []
         for i in connection.connect_neighbours():
-            print(i)
+            
             x = np.array(df.iloc[i[0], 2:-1]).astype(float).reshape(-1,1)
             y = np.array(df.iloc[i[1], 2:-1]).astype(float).reshape(-1,1)
             
@@ -89,13 +95,24 @@ class Main():
               
                 ccre_value = abs(ccre_value)
             
-            ccre_distances_values.append(ccre_value)
             
             # write to csv files
             ccre_data = [df.index[i[0]], df.index[i[1]],self.hospital, self.diagnosis, cre_x_value, cre_y_value, expect_value_cre_xy[0], ccre_value]
-            ccre_file.write_to_csv_file(ccre_data)
             euclidean_data = [df.index[i[0]], df.index[i[1]],self.hospital, self.diagnosis, euclidean_value, euclidean_similarity_value]
-            euclidean_file.write_to_csv_file(euclidean_data)
+            if self.created_cre_file:
+                with open("CCRE_distances.csv", "a", newline="") as file:
+                    writer = csv.writer(file)
+                    writer.writerow(ccre_data)
+            else:
+                
+                ccre_file.write_to_csv_file(ccre_data)
+            
+            if self.created_euclidean_file:
+                with open("euclidean_distances.csv", "a", newline="") as file:
+                    writer = csv.writer(file)
+                    writer.writerow(euclidean_data)
+            else:
+                euclidean_file.write_to_csv_file(euclidean_data)
         
         
         
