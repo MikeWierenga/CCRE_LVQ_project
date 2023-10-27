@@ -42,20 +42,22 @@ class Main():
         diagnosis.rename(columns={0: "diagnosis_label"}, inplace=True)
 
         df = data.combine_dataframes(center, diagnosis, feature_vectors)
-        df = df[(df['center_label'] == self.hospital) & (df['diagnosis_label'] == self.diagnosis)]
-
+        df = df[(df['center_label'].isin(self.hospital)) & (df['diagnosis_label'].isin(self.diagnosis))]
+        
+        df = data.limit_dataframe(df, 5)
+        
         # create csv file
-        if not os.path.isfile(f"CCRE_distances.csv"):
+        if not os.path.isfile(f"CCRE_distances_{self.hospital}_{self.diagnosis}.csv"):
             
-            ccre_file = csv_file.CSV(f"CCRE_distances.csv")
+            ccre_file = csv_file.CSV(f"CCRE_distances_{self.hospital}_{self.diagnosis}.csv")
             header = ["id_x", "id_y", "hospital", "diagnosis", "cre(x)", "cre(y)", "E[cre(X|Y)]", "ccre(X|Y)"]
             ccre_file.write_to_csv_file(header)
         else:
         
             self.created_cre_file = True
-        if not os.path.isfile(f"euclidean_distances.csv"):
+        if not os.path.isfile(f"euclidean_distances_{self.hospital}_{self.diagnosis}.csv"):
             
-            euclidean_file = csv_file.CSV(f"euclidean_distances.csv")
+            euclidean_file = csv_file.CSV(f"euclidean_distances_{self.hospital}_{self.diagnosis}.csv")
             header = ["id_x", "id_y", "hospital", "diagnosis", "euclidean_distance", "euclidean_similarity"]
             euclidean_file.write_to_csv_file(header)
         else:
@@ -119,9 +121,13 @@ class Main():
 hospitals = ["UMCG", "CUN", "UGOSM"]
 diagnosis = ["HC", "AD", "PD"]
 
-for hospital in hospitals:
-    for diagnosi in diagnosis:
-        if (hospital == "CUN") & (diagnosi == "AD"):
-            continue
-        Main(hospital, diagnosi).main()
+# for hospital in hospitals:
+#     for diagnosi in diagnosis:
+#         if (hospital == "CUN") & (diagnosi == "AD"):
+#             continue
+#         Main(hospital, diagnosi).main()
 
+Main(hospitals, ["AD", "PD"]).main()
+Main(hospitals, ["HC", "AD"]).main()
+Main(hospitals, ["HC", "PD"]).main()
+Main(hospitals, ["HC", "AD", "PD"]).main()
