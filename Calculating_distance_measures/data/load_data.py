@@ -24,14 +24,3 @@ class Load_Data:
                 list_of_df.append(df[(df.center_label == center) & (df.diagnosis_label == diagnosis)][:amount] )
             
         return pd.concat(list_of_df)
-# test = Load_Data()
-# feature_vectors = test.get_dataframe('feature_vectors')
-# feature_vectors = feature_vectors.set_axis(list(range(1, 36)), axis=1)
-# center = test.get_dataframe('center_label')
-# center.rename(columns={0: "center_label"}, inplace=True)
-
-# diagnosis = test.get_dataframe('diagnosis_label')
-# diagnosis.rename(columns={0: "diagnosis_label"}, inplace=True)
-
-# df = test.combine_dataframes(center, diagnosis, feature_vectors)
-# print(test.limit_dataframe(df, 10))
