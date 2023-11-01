@@ -45,4 +45,4 @@ class CRE:
         sigma = np.sqrt(np.var(data))
         mu = np.mean(data)
         
-        return - 1 * integrate.quad(self.cumulative_distribution, 0, np.inf, args=(mu, sigma))[0]
+        return - 1 * integrate.quad(self.cumulative_distribution, mu, np.inf, args=(mu, sigma))[0]
