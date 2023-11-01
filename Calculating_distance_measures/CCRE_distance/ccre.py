@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import stats
+import cre as cre_class
 class CCRE:
     def __init__(self, data):
         self.data = data
@@ -17,8 +18,8 @@ class CCRE:
         x = data[1, :]
         self.mean = np.mean([y,x], axis=1)
         self.cov = np.cov(data)
-        self.invcov = np.linalg.pinv(self.cov)
-        self.detcov = np.linalg.det(self.cov)
+        # self.invcov = np.linalg.pinv(self.cov)
+        # self.detcov = np.linalg.det(self.cov)
 
 
     def calculate_joint_dist(self, new_entry):
@@ -77,7 +78,7 @@ class CCRE:
         return formula
      
 
-    def calculate_expectation_value(self, y, x, mu, sigma, sigma2, cov, cre_class):
+    def calculate_expectation_value(self, y, x, mu, sigma, cov):
         # expectation value E(X) = integral from -inf to inf of x * probability of x
         # our case E(cre(Y|X)) = cre(Y|X) * pX(x)
         """
@@ -85,26 +86,29 @@ class CCRE:
         """
         self.data = x
         conditional_mean = self.mean_conditional_distribution()
-        cre = cre_class.cumulative_distribution(y, conditional_mean, np.sqrt(cov))
+        cre_yx = cre_class.CRE(x)
+        cre_value = cre_yx.cumulative_distribution(y, conditional_mean, np.sqrt(cov))
         
         
         p = self.calculate_margin_pdf(x, mu, sigma) 
         
-        formula = cre * p
+        formula = cre_value * p
         return formula 
     
 
     
-    def calculate_expectation_value_xy(self, x, y, mu_y, sigma_y, sigma2_y, cov, cre_class):
+    def calculate_expectation_value_xy(self, x, y, mu_y, sigma_y, cov):
         """
         Calculates the expectation value of cre(X|Y)
         """
         self.data = y
         conditional_mean = self.mean_conditional_distribution()
-        cre = cre_class.cumulative_distribution(x, conditional_mean, np.sqrt(cov)) 
+        cre_xy = cre_class.CRE(x)
+        cre_value = cre_xy.cumulative_distribution(x, conditional_mean, np.sqrt(cov)) 
+        
         p = self.calculate_margin_pdf(y, mu_y, sigma_y) 
         
-        formula = cre * p
+        formula = cre_value * p
         return formula 
       
     def calculate_CCRE(self, entropy, expectation_value):
