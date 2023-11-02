@@ -102,7 +102,7 @@ class Main():
         ccre_value = (cre_x_value + (expect_value_cre_xy[0]))/cre_x_value
         if ccre_value < 0:
             
-            ccre_value = abs(ccre_value)
+            ccre_value = 0
         
 
         # write to csv files
