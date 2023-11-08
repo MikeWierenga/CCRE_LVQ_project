@@ -14,7 +14,7 @@ class KNN:
         self.y = []
     
     def create_model(self):
-        model = KNeighborsClassifier(n_neighbors=self.neighbours, metric=self.metric)
+        model = KNeighborsClassifier(n_neighbors=self.neighbours, metric=self.metric, n_jobs=-1)
         return model
     
     def fit_model(self, x, y):
