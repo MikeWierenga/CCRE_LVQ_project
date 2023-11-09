@@ -9,13 +9,13 @@ import cre
 import ccre
 class KNN:
     def __init__(self):
-        self.neighbours = 5
-        self.weights = 'uniform'
-        self.algorithm = 'auto'
-        self.leaf_size = 30
-        self.p = 2
-        self.metric = 'minkowski'
-        self.n_jobs = -1
+        self.n_neighbors = [5]
+        self.weights = ['uniform']
+        self.algorithm = ['auto']
+        self.leaf_size = [30]
+        self.p = [2]
+        self.metric = ['minkowski']
+        self.n_jobs = [-1]
         self.model = self.create_model()
      
     def create_model(self):
@@ -23,17 +23,17 @@ class KNN:
         return model
     
     def set_parameters(self, n_neighbors =5, weights='uniform', algorithm='auto', leaf_size=30, p =2, metric='minkowski', n_jobs=-1):
-         self.neighbours = n_neighbors
-         self.weights = weights
-         self.algorithm = algorithm
-         self.leaf_size = leaf_size
-         self.p = p
-         self.metric = metric
-         self.n_jobs = n_jobs
+         self.n_neighbors = list(n_neighbors)
+         self.weights = list(weights)
+         self.algorithm = list(algorithm)
+         self.leaf_size = list(leaf_size)
+         self.p = list(p)
+         self.metric = list(metric)
+         self.n_jobs = list(n_jobs)
 
     def gridsearch(self):
-        params = [self.neighbours, self.weights, self.algorithm, self.leaf_size, self.p, self.metric, self.n_jobs]
-        model = GridSearchCV(self.model, param_grid=params, n_jobs=-1)
+        params = {'n_neighbors':self.n_neighbors, 'weights':self.weights, 'algorithm':self.algorithm, 'leaf_size':self.leaf_size, 'p':self.p, 'metric':self.metric, 'n_jobs':self.n_jobs}
+        model = GridSearchCV(self.model, param_grid=params, n_jobs=-1, verbose=2)
         return model
     
     def make_predict(self, model, new_entry):

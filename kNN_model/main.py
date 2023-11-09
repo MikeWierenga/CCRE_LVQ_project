@@ -64,14 +64,16 @@ class main:
     data = self.load_data()
     patients_to_remove = [106,109,110,130,154, 156, 159, 23, 25, 27,30,32,34,35,36,40,52, 56, 104,110,111,117,120,134,140,148,159,161,162, 171,179,180,181,182,191,192,196,205,211,215,216, 230,233,236,237,238,239,242,243,245, 247,252,253,254,256,258,262,272,275,277,279,284,285,286,287,289,290,291,292,294,295,296,297,298,299,300,301,303]
     data = data.drop(index=patients_to_remove)
-    #oversampling with SMOTE because it does not duplicate rows and is not only looking at outliers like adasyn does
+    #oversampling with SMOTE because it does not duplicate rows and is not only looking at outliers like adasyn does. link: https://imbalanced-learn.org/stable/over_sampling.html
 
     X = data.loc[:, 1:34].values
     y = list(data['center_label'] + data['diagnosis_label'])
     X_resampled, y_resampled = SMOTE().fit_resample(X, y)
-    print(len(y_resampled))
+  
     #model
-    knn_model = kNN.KNN(1, self.ccre_distance)
+    knn_model = kNN.KNN()
+    # knn_model.set_parameters()
+    gridsearch = knn_model.gridsearch().fit(X_resampled, y_resampled)
     
     
 
