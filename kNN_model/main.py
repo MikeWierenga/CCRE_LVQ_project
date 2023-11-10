@@ -68,11 +68,17 @@ class main:
 
     X = data.loc[:, 1:34].values
     y = list(data['center_label'] + data['diagnosis_label'])
-    X_resampled, y_resampled = SMOTE().fit_resample(X, y)
+    X_resampled, y_resampled = SMOTE().fit_resample(X[:45], y[:45])
   
     #model
     knn_model = kNN.KNN()
-    # knn_model.set_parameters()
+    n_neighbors = np.linspace(1,10, num=10)
+    weights = ['uniform', 'distance']
+    algorithm = ['auto', 'ball_tree', 'kd_tree', 'brute']
+    n_jobs = [8]
+    metrics = ['euclidean', self.ccre_distance] 
+    knn_model.set_parameters(n_neighbors=n_neighbors, weights=weights, algorithm=algorithm,metric=metrics, n_jobs=n_jobs)
+    
     gridsearch = knn_model.gridsearch().fit(X_resampled, y_resampled)
     
     

@@ -23,17 +23,18 @@ class KNN:
         return model
     
     def set_parameters(self, n_neighbors =5, weights='uniform', algorithm='auto', leaf_size=30, p =2, metric='minkowski', n_jobs=-1):
-         self.n_neighbors = list(n_neighbors)
-         self.weights = list(weights)
-         self.algorithm = list(algorithm)
-         self.leaf_size = list(leaf_size)
-         self.p = list(p)
-         self.metric = list(metric)
-         self.n_jobs = list(n_jobs)
+        #  print(list(n_neighbors))
+         self.n_neighbors = [n_neighbors]
+         self.weights = [weights]
+         self.algorithm = [algorithm]
+         self.leaf_size = [leaf_size]
+         self.p = [p]
+         self.metric = [metric]
+         self.n_jobs = [n_jobs]
 
     def gridsearch(self):
         params = {'n_neighbors':self.n_neighbors, 'weights':self.weights, 'algorithm':self.algorithm, 'leaf_size':self.leaf_size, 'p':self.p, 'metric':self.metric, 'n_jobs':self.n_jobs}
-        model = GridSearchCV(self.model, param_grid=params, n_jobs=-1, verbose=2)
+        model = GridSearchCV(self.model, param_grid=params, n_jobs=8, verbose=2)
         return model
     
     def make_predict(self, model, new_entry):
