@@ -126,11 +126,59 @@ class Test_testcre(unittest.TestCase):
             print(f"ccre(Y - Y|X) = {(cre_y_value + (expect_value_cre_yx[0]))/cre_y_value}\n")
             print(f"ccre(Y - X|Y) = {(cre_y_value + (expected_value_cre_xy[0]))/cre_y_value}\n")
 
-    def test_mean_distribution(self):
-        pass
+    
+    def test_push_the_prototype_towards_datapoint(self):
+        x = self.use_data[0]
+        y = self.use_data[1]
+        original_data = np.concatenate((self.use_data[0],self.use_data[1]), axis=1)
+        old_cre_value = self.calculate_cre(x)
+        old_cre_y_value = self.calculate_cre(y)
+      
+        
+        if old_cre_value == old_cre_y_value:
+            old_expected_value_cre_xy = [0]
+        else:
+            old_expected_value_cre_xy = self.calculate_expectation_value_xy(original_data.T, np.mean(y), np.std(y))
+        
+        #change this to how simmilar you want y to be to x the percentage parameter is your change towards the X 
+        percentage = 1
+        new_data = []
+        for i in original_data:
+            if i[0] < i[1]:
+                difference = i[1] - i[0]
+        
+            elif i[0] > i[1]:
+                difference = -(i[0] - i[1])
 
-    def test_standard_deviation(self):    
-        pass
+            else:
+                print('equal')
+            difference = difference * percentage
+           
+            new_data.append([i[0], i[1]-difference])   
+        new_data = np.array(new_data)
+        new_x = new_data[:, 0].reshape(-1,1)
+        
+        new_y = new_data[:, 1].reshape(-1,1)            
+        mean_y = np.mean(new_y)
+        sigma_y = np.std(new_y)
+        new_data= np.concatenate((new_y, new_x), axis = 1)
+
+        cre_value = self.calculate_cre(new_x)
+        cre_y_value = self.calculate_cre(new_y)
+        
+        new_data_xy= np.concatenate((new_x, new_y), axis = 1)
+        if cre_value == cre_y_value:
+            
+            expected_value_cre_xy = [0]
+        else:
+            
+           
+            expected_value_cre_xy = self.calculate_expectation_value_xy(new_data_xy.T, mean_y, sigma_y)
+
+        print(old_cre_value, old_cre_y_value, old_expected_value_cre_xy, (old_cre_value + old_expected_value_cre_xy[0])/old_cre_value)
+        print(cre_value, cre_y_value, expected_value_cre_xy, (cre_value + expected_value_cre_xy[0])/cre_value)
+    
+    
       
 if __name__ == '__main__':
     unittest.main()
