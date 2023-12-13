@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.integrate as integrate
 import unittest
-
+import random
 
 class Test_testcre(unittest.TestCase):
     def setUp(self):
@@ -85,46 +85,46 @@ class Test_testcre(unittest.TestCase):
             
             before = cre_value
 
-    def test_unrelated_to_related_gaussian_distribution(self):
+    # def test_unrelated_to_related_gaussian_distribution(self):
 
-        x = np.random.normal(0,1, 100).reshape(-1,1)
-        y = np.random.normal(0,1, 100).reshape(-1,1)
-        original_data = np.concatenate((self.use_data[0],self.use_data[1]), axis=1)
+    #     x = np.random.normal(0,1, 100).reshape(-1,1)
+    #     y = np.random.normal(0,1, 100).reshape(-1,1)
+    #     original_data = np.concatenate((self.use_data[0],self.use_data[1]), axis=1)
        
         
-        for i in np.linspace(0, 1, 10):
-            print(f'PERCENTAGE = {i}')
-            m = np.array([[1,0], [np.sin(np.pi/2*i),np.cos(np.pi/2*i)]]).T
+    #     for i in np.linspace(0, 1, 10):
+    #         print(f'PERCENTAGE = {i}')
+    #         m = np.array([[1,0], [np.sin(np.pi/2*i),np.cos(np.pi/2*i)]]).T
 
-            new_data = np.dot(original_data, m)         
+    #         new_data = np.dot(original_data, m)         
             
-            new_x = new_data[:, 0].reshape(-1,1)
-            mean_x = np.mean(new_x)
-            sigma = np.std(new_x)
+    #         new_x = new_data[:, 0].reshape(-1,1)
+    #         mean_x = np.mean(new_x)
+    #         sigma = np.std(new_x)
            
-            new_y = new_data[:, 1].reshape(-1,1)            
-            mean_y = np.mean(new_y)
-            sigma_y = np.std(new_y)
-            new_data= np.concatenate((new_y, new_x), axis = 1)
+    #         new_y = new_data[:, 1].reshape(-1,1)            
+    #         mean_y = np.mean(new_y)
+    #         sigma_y = np.std(new_y)
+    #         new_data= np.concatenate((new_y, new_x), axis = 1)
             
-            cre_value = self.calculate_cre(new_x)
-            cre_y_value = self.calculate_cre(new_y)
+    #         cre_value = self.calculate_cre(new_x)
+    #         cre_y_value = self.calculate_cre(new_y)
             
-            new_data_xy= np.concatenate((new_x, new_y), axis = 1)
-            if cre_value == cre_y_value:
-                expect_value_cre_yx= [0]
-                expected_value_cre_xy = [0]
-            else:
+    #         new_data_xy= np.concatenate((new_x, new_y), axis = 1)
+    #         if cre_value == cre_y_value:
+    #             expect_value_cre_yx= [0]
+    #             expected_value_cre_xy = [0]
+    #         else:
                
-                expect_value_cre_yx = self.calculate_expectation_value_yx(new_data.T, mean_x, sigma)
-                expected_value_cre_xy = self.calculate_expectation_value_xy(new_data_xy.T, mean_y, sigma_y)
+    #             expect_value_cre_yx = self.calculate_expectation_value_yx(new_data.T, mean_x, sigma)
+    #             expected_value_cre_xy = self.calculate_expectation_value_xy(new_data_xy.T, mean_y, sigma_y)
             
-            print(f"cre(X) = {cre_value} cre(Y){cre_y_value} E[e(Y|X)]{expect_value_cre_yx[0]}")
-            print(f"ccre(X - Y|X) = {(cre_value + (expect_value_cre_yx[0]))/cre_value}\n")
+    #         print(f"cre(X) = {cre_value} cre(Y){cre_y_value} E[e(Y|X)]{expect_value_cre_yx[0]}")
+    #         print(f"ccre(X - Y|X) = {(cre_value + (expect_value_cre_yx[0]))/cre_value}\n")
             
-            print(f"ccre(X - X|Y) = {(cre_value + (expected_value_cre_xy[0]))/cre_value}\n")
-            print(f"ccre(Y - Y|X) = {(cre_y_value + (expect_value_cre_yx[0]))/cre_y_value}\n")
-            print(f"ccre(Y - X|Y) = {(cre_y_value + (expected_value_cre_xy[0]))/cre_y_value}\n")
+    #         print(f"ccre(X - X|Y) = {(cre_value + (expected_value_cre_xy[0]))/cre_value}\n")
+    #         print(f"ccre(Y - Y|X) = {(cre_y_value + (expect_value_cre_yx[0]))/cre_y_value}\n")
+    #         print(f"ccre(Y - X|Y) = {(cre_y_value + (expected_value_cre_xy[0]))/cre_y_value}\n")
 
     
     def test_push_the_prototype_towards_datapoint(self):
@@ -177,8 +177,15 @@ class Test_testcre(unittest.TestCase):
 
         print(old_cre_value, old_cre_y_value, old_expected_value_cre_xy, (old_cre_value + old_expected_value_cre_xy[0])/old_cre_value)
         print(cre_value, cre_y_value, expected_value_cre_xy, (cre_value + expected_value_cre_xy[0])/cre_value)
+        plt.scatter(x, y)
+        plt.show()
+        plt.scatter(new_x, new_y)
+        plt.show()
+        
+
     
-    
-      
+
+
 if __name__ == '__main__':
     unittest.main()
+    
