@@ -3,6 +3,8 @@ import random
 import cre 
 import ccre
 import scipy.integrate as integrate
+import matplotlib.pyplot as plt
+
 def calculate_cre(data):
         cre_x = cre.CRE(data)
         cre_value_x = cre_x.cre_gaussian_distribution()
@@ -87,28 +89,38 @@ def get_new_prototype(original_data, row, prototype, original_ccre_value, differ
         new_ccre_value = calculate_ccre(new_data, row, prototype)
      
         if (new_ccre_value - original_ccre_value) >= difference_in_ccre:
-                # print(new_ccre_value, original_ccre_value)
+                print(new_ccre_value, original_ccre_value)
                 return prototype
-        # else:
-        #     print('i got here', new_ccre_value - original_ccre_value)
+        else:
+            print('i got here', new_ccre_value - original_ccre_value)
 
 def test_gradientfunction_with_ccre(data, prototype, difference_in_ccre=0.1):
-        
-      
         length_data = len(data)
-    
         random_order = random.sample(range(length_data), length_data)
         prototype = np.array(prototype).reshape(-1,1)
+        
         for item in random_order:
             row = np.array(data[item]).reshape(-1,1)
-            original_data =np.concatenate((row, prototype), axis=1)
+            original_data =np.concatenate((row, prototype), axis=1)    
+                      
+            x = original_data[:2, 0][0]
+            y = original_data[:2, 0][1]
             
             original_ccre_value = calculate_ccre(original_data, row, prototype)
-           
+            
             prototype = get_new_prototype(original_data, row, prototype, original_ccre_value, difference_in_ccre)
-           
-       
+            
+            
+            plt.scatter(x, y, color='green')
+        x = prototype[0]
+        y = prototype[1]
+        plt.scatter(x,y, color ='black')
+        plt.title('test gradient function')
+        plt.xlabel('first value in list')
+        plt.ylabel('second value in list')
+        plt.show()
         return prototype
-data = [list(np.random.normal(0, 1, 35)) for _ in range (35)]
+data = [list(np.random.normal(0, 1, 35)) for _ in range (10)]
 prototype = [np.random.normal(0, 1, 35)]
+
 print(test_gradientfunction_with_ccre(data, prototype))
