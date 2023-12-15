@@ -122,5 +122,6 @@ def test_gradientfunction_with_ccre(data, prototype, difference_in_ccre=0.1):
         return prototype
 data = [list(np.random.normal(0, 1, 35)) for _ in range (10)]
 prototype = [np.random.normal(0, 1, 35)]
-
-print(test_gradientfunction_with_ccre(data, prototype))
+for _ in range(10):
+    prototype = test_gradientfunction_with_ccre(data, prototype)
+    print(prototype)
