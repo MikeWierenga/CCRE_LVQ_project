@@ -8,9 +8,10 @@ class LVQ:
     def train(self, epoch, dataset, prototype, metric, difference_in_ccre=0.05):
         new_prototype = np.array(prototype).reshape(-1,1).astype(float)
         n_data = len(dataset)
-        random_order = random.sample(range(n_data), n_data)
+        
         prototypes = []
         for _ in range(epoch):
+            random_order = random.sample(range(n_data), n_data)
             for item in random_order:
                 row = np.array(dataset.iloc[item]).reshape(-1,1)
                 
