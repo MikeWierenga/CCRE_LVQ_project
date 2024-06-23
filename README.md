@@ -27,10 +27,13 @@ If you do not have access to the data you can try this by creating Gaussian-dist
 
 # Code
 
-The code has been supplied with comments and where possible there is an article to show what functions are based on (see CCRE.py for example)
+The code has been supplied with comments and where possible there is an article to show what functions are based on (see CCRE.py for example).
+
 
 # usage
 To calculate all similarities run the main file in the Calculating_distance_measures folder this creates an adjacency matrix for both Euclidean distance as well as CCRE
+To run Knn please see the data collection folder which uses the the adjacency matrix to classify the classes. This is used because calculating CCRE similarity takes a lot of time.
+To run the LVQ model run the main file in the LVQ folder. This is an alternative version of LVQ. Normally a gradient function is written but this was not successful due to time limitation
 
 # License
 Distributed under the MIT License. SEE LICENSE for more information
