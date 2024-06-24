@@ -25,7 +25,37 @@ The data used during this project consisted of FDG-PET scan images loaded via a 
 PCA has been applied to these images.
 If you do not have access to the data you can try this by creating Gaussian-distributed data in python.
 
+# libraries
+Here is a list of all the python libraries used during this study:
+
+Python==3.11.5
+
+Jupyter notebook==6.5.4
+
+Scikit learn==2.0.3
+
+Pandas==2.0.3
+
+SciPy==1.11.1
+
+CSV==1.0
+
+YAML==6.0
+
+Multiprocessing==0.70.14
+
+Unit test==3.2
+
+Bokeh==3.2.1
+
+Matplotlib==3.7.2
+
+NumPy==1.24.3
+
+Panel==1.2.3
+
 # Code
+
 
 The code has been supplied with comments and where possible there is an article to show what functions are based on (see CCRE.py for example).
 
