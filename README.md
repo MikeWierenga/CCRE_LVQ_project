@@ -69,3 +69,7 @@ To run the LVQ model run the main file in the LVQ folder. This is an alternative
 
 # License
 Distributed under the MIT License. SEE LICENSE for more information
+
+# Questions
+
+For questions please email mk.wierenga@st.hanze.nl
